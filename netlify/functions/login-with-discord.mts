@@ -18,6 +18,7 @@ export default async (req: Request, context: Context) => {
     const clientId = Netlify.env.get("CLIENT_ID") ?? "";
     const clientSecret = Netlify.env.get("CLIENT_SECRET") ?? "";
     const redirectUri = Netlify.env.get("REDIRECT_URI") ?? "";
+    const formUrl = Netlify.env.get("FORM_URL") ?? "";
 
     // Exchange the authorization code for an access token
     const tokenResponse = await fetch("https://discord.com/api/oauth2/token", {
@@ -72,7 +73,7 @@ export default async (req: Request, context: Context) => {
     const discordUsername = `${username}#${discriminator}`;
 
     // Construct the external form URL with the user’s Discord ID and username
-    const formUrl = `https://external-form-url.com/form?name=${encodeURIComponent(
+    const formUrlwithParams = `${formUrl}?name=${encodeURIComponent(
       discordUsername
     )}&id=${id}`;
 
@@ -80,7 +81,7 @@ export default async (req: Request, context: Context) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: formUrl,
+        Location: formUrlwithParams,
       },
     });
   } catch (error) {

@@ -1,6 +1,6 @@
 import type { Context } from "@netlify/functions";
-const { Client: NotionClient } = require("@notionhq/client");
-const { Client: DiscordClient, GatewayIntentBits } = require("discord.js");
+import { Client as NotionClient } from "@notionhq/client";
+import { Client as DiscordClient, GatewayIntentBits } from "discord.js";
 
 // get environment variables
 const notionSecret = Netlify.env.get("NOTION_SECRET") ?? "";

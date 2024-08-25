@@ -40,7 +40,7 @@ export default async (req: Request, context: Context) => {
           page.properties["First name"].rich_text[0].text.content;
         const lastName = page.properties["Last name"].rich_text[0].text.content;
         const fullName = firstName + " " + lastName;
-        const school = page.properties["School"].multi_select[0].name;
+        const school = page.properties["School"].select.name;
         return { userName, discordId, fullName, school };
       })
     );

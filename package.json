@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@netlify/functions": "^2.8.1",
+    "@notionhq/client": "^2.2.15",
+    "discord.js": "^14.15.3",
     "nuxt": "^3.12.4",
     "vue": "latest"
   },

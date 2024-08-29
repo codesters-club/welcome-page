@@ -58,12 +58,22 @@ export default async (req: Request, context: Context) => {
         // retrieve each entry as a page from Notion
         const page = await notion.pages.retrieve({ page_id: entry.id });
         const discordId =
-          page.properties["Discord ID"].rich_text[0].text.content;
+          page.properties["Discord ID"]?.rich_text[0].text.content;
+        console.log("discordId", discordId);
+
         const firstName =
-          page.properties["Firstname"].rich_text[0].text.content;
-        const lastName = page.properties["Lastname"].rich_text[0].text.content;
+          page.properties["Firstname"]?.rich_text[0].text.content;
+        console.log("firstName", firstName);
+
+        const lastName = page.properties["Lastname"]?.rich_text[0].text.content;
+        console.log("lastName", lastName);
+
         const fullName = firstName.trim() + " " + lastName.trim();
+        console.log("fullName", fullName);
+
         const school = page.properties["intro form school"].select.name;
+        console.log("school", school);
+
         return { discordId, fullName, school };
       })
     );

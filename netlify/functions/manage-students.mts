@@ -8,6 +8,19 @@ const notionDatabaseId = Netlify.env.get("NOTION_DATABASE_ID") ?? "";
 const discordBotToken = Netlify.env.get("DISCORD_BOT_TOKEN") ?? "";
 const discordGuildId = Netlify.env.get("DISCORD_GUILD_ID") ?? "";
 
+// Discord role for generation 24
+const genRoleId = "1275384492499927086";
+// Doscord role IDs per school
+const roleIds = {
+  "Kadrioru Saksa Gümnaasium": "1277266078464086178",
+  "Tallinna Ühisgümnaasium": "",
+  "Tallinna Mustamäe Gümnaasium": "",
+  "Tallinna Tehnikagümnaasium": "1275384613992267777",
+  "Lasnamäe Gümnaasium": "",
+  "Narva Gümnaasium": "1277266122575712337",
+  "Tartu Jaan Poska Gümnaasium": "",
+};
+
 // Set up Notion client
 const notion = new NotionClient({ auth: notionSecret });
 
@@ -55,13 +68,11 @@ export default async (req: Request, context: Context) => {
           await member.setNickname(fullName);
 
           // Assign the role
-          const gen24Role = await guild.roles.fetch("1275384492499927086");
-          const ttg24Role = await guild.roles.fetch("1275384613992267777");
-          const ksg24Role = await guild.roles.fetch("1277266078464086178");
-          const narg24Role = await guild.roles.fetch("1277266122575712337");
 
-          if (gen24Role) {
-            await member.roles.add(gen24Role);
+          const genRole = await guild.roles.fetch(genRoleId);
+
+          if (genRole) {
+            await member.roles.add(genRole);
             console.log(
               `Assigned role and renamed ${fullName} (Discord ID: ${discordId})`
             );
@@ -69,25 +80,14 @@ export default async (req: Request, context: Context) => {
             console.error(`Role not found`);
           }
 
-          if (ttg24Role && school === "TTG") {
-            await member.roles.add(ttg24Role);
-            console.log(
-              `Assigned TTG24 role and renamed ${fullName} (Discord ID: ${discordId})`
-            );
-          }
-
-          if (ksg24Role && school === "KSG") {
-            await member.roles.add(ksg24Role);
-            console.log(
-              `Assigned KSG24 role and renamed ${fullName} (Discord ID: ${discordId})`
-            );
-          }
-
-          if (narg24Role && school === "NARG") {
-            await member.roles.add(narg24Role);
-            console.log(
-              `Assigned NARG24 role and renamed ${fullName} (Discord ID: ${discordId})`
-            );
+          for (const [schoolName, roleId] of Object.entries(roleIds)) {
+            const role = await guild.roles.fetch(roleId);
+            if (role && school === schoolName) {
+              await member.roles.add(role);
+              console.log(
+                `Assigned ${schoolName} role and renamed ${fullName} (Discord ID: ${discordId})`
+              );
+            }
           }
         } else {
           console.error(`Member with Discord ID ${discordId} not found`);

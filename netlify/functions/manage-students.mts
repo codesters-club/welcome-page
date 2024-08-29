@@ -39,22 +39,32 @@ export default async (req: Request, context: Context) => {
     // Fetch users from Notion database
     const notionResponse = await notion.databases.query({
       database_id: notionDatabaseId,
+      filter: {
+        property: "Discord ID",
+        rich_text: {
+          is_not_empty: true,
+        },
+      },
+      sorts: [
+        {
+          property: "Created time",
+          direction: "ascending",
+        },
+      ],
     });
 
     const users = await Promise.all(
       notionResponse.results.map(async (entry: { id: string }) => {
         // retrieve each entry as a page from Notion
         const page = await notion.pages.retrieve({ page_id: entry.id });
-        const userName =
-          page.properties["Discord Name"].rich_text[0].text.content;
         const discordId =
           page.properties["Discord ID"].rich_text[0].text.content;
         const firstName =
-          page.properties["First name"].rich_text[0].text.content;
-        const lastName = page.properties["Last name"].rich_text[0].text.content;
-        const fullName = firstName + " " + lastName;
-        const school = page.properties["School"].select.name;
-        return { userName, discordId, fullName, school };
+          page.properties["Firstname"].rich_text[0].text.content;
+        const lastName = page.properties["Lastname"].rich_text[0].text.content;
+        const fullName = firstName.trim() + " " + lastName.trim();
+        const school = page.properties["intro form school"].select.name;
+        return { discordId, fullName, school };
       })
     );
 
@@ -68,6 +78,11 @@ export default async (req: Request, context: Context) => {
           await member.setNickname(fullName);
 
           // Assign the role
+
+          // extra logging
+          console.log(
+            `Processing ${fullName} (Discord ID: ${discordId}, School: ${school})`
+          );
 
           const genRole = await guild.roles.fetch(genRoleId);
 

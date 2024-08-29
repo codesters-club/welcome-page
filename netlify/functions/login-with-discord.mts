@@ -69,12 +69,11 @@ export default async (req: Request, context: Context) => {
     }
 
     const userData = await userResponse.json();
-    const { id, username, discriminator } = userData;
-    const discordUsername = `${username}#${discriminator}`;
+    const { id, username } = userData;
 
     // Construct the external form URL with the user’s Discord ID and username
     const formUrlwithParams = `${formUrl}?name=${encodeURIComponent(
-      discordUsername
+      username
     )}&id=${id}`;
 
     // Redirect the user to the form URL

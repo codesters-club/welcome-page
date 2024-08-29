@@ -1,8 +1,21 @@
 <template>
   <div>
-    <div class="fixed inset-0 flex justify-center items-center">
+    <div
+      class="fixed inset-0 flex flex-col justify-center items-center bg-black text-white gap-8"
+    >
+      <img
+        src="/codesters.club-animated-logo.gif"
+        alt="Codesters club"
+        class="size-24 rounded-full"
+      />
+      <div class="text-center max-w-72">
+        <h1 class="text-xl font-black mb-4">Codesters.club</h1>
+        <p>
+          Please login with Discord account and fill the form to join the club
+        </p>
+      </div>
       <a
-        class="px-8 py-6 bg-[#5865F2] text-white rounded-lg flex items-center justify-center gap-2"
+        class="px-6 py-4 bg-[#5865F2] text-white rounded-lg flex items-center justify-center gap-2 ring-[#5865F2] ring-offset-black ring-0 hover:ring-4 hover:ring-offset-8 transition duration-500 hover:scale-105"
         href="https://discord.com/oauth2/authorize?client_id=1276146185228390502&response_type=code&redirect_uri=https%3A%2F%2Fcodesters-welcome.netlify.app%2F.netlify%2Ffunctions%2Flogin-with-discord&scope=identify"
       >
         <svg
@@ -21,7 +34,7 @@
             ></path>
           </g>
         </svg>
-        <span>Continue with Discord</span>
+        <span>Login with Discord</span>
       </a>
     </div>
   </div>

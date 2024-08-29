@@ -9,16 +9,16 @@ const discordBotToken = Netlify.env.get("DISCORD_BOT_TOKEN") ?? "";
 const discordGuildId = Netlify.env.get("DISCORD_GUILD_ID") ?? "";
 
 // Discord role for generation 24
-const genRoleId = "1275384492499927086";
+const genRoleId = "1278698426493571083";
 // Doscord role IDs per school
 const roleIds = {
-  "Kadrioru Saksa Gümnaasium": "1277266078464086178",
-  "Tallinna Ühisgümnaasium": "",
-  "Tallinna Mustamäe Gümnaasium": "",
-  "Tallinna Tehnikagümnaasium": "1275384613992267777",
+  "Kadrioru Saksa Gümnaasium": "1278698662498795562",
+  "Tallinna Ühisgümnaasium": "1278698829755056200",
+  "Tallinna Mustamäe Gümnaasium": "1278698885480452117",
+  "Tallinna Tehnikagümnaasium": "1278698979537846302",
   "Lasnamäe Gümnaasium": "",
-  "Narva Gümnaasium": "1277266122575712337",
-  "Tartu Jaan Poska Gümnaasium": "",
+  "Narva Gümnaasium": "1278699039042310145",
+  "Tartu Jaan Poska Gümnaasium": "1278699546158960683",
 };
 
 // Set up Notion client
@@ -59,24 +59,21 @@ export default async (req: Request, context: Context) => {
         const page = await notion.pages.retrieve({ page_id: entry.id });
         const discordId =
           page.properties["Discord ID"]?.rich_text[0].text.content;
-        console.log("discordId", discordId);
 
         const firstName =
           page.properties["Firstname"]?.rich_text[0].text.content;
-        console.log("firstName", firstName);
 
         const lastName = page.properties["Lastname"]?.rich_text[0].text.content;
-        console.log("lastName", lastName);
 
         const fullName = firstName.trim() + " " + lastName.trim();
-        console.log("fullName", fullName);
 
         const school = page.properties["intro form school"].select.name;
-        console.log("school", school);
 
         return { discordId, fullName, school };
       })
     );
+
+    const logs: string[] = [];
 
     const guild = await discordClient.guilds.fetch(discordGuildId);
 
@@ -86,39 +83,41 @@ export default async (req: Request, context: Context) => {
         if (member) {
           // Rename the user
           await member.setNickname(fullName);
+          logs.push(`Renamed ${fullName} (Discord ID: ${discordId})`);
 
           // Assign the role
-
-          // extra logging
-          console.log(
-            `Processing ${fullName} (Discord ID: ${discordId}, School: ${school})`
-          );
-
           const genRole = await guild.roles.fetch(genRoleId);
 
           if (genRole) {
             await member.roles.add(genRole);
-            console.log(
-              `Assigned role and renamed ${fullName} (Discord ID: ${discordId})`
+            logs.push(
+              `Assigned generation role and renamed ${fullName} (Discord ID: ${discordId})`
             );
           } else {
             console.error(`Role not found`);
+            logs.push(`Role not found`);
           }
 
           for (const [schoolName, roleId] of Object.entries(roleIds)) {
             const role = await guild.roles.fetch(roleId);
             if (role && school === schoolName) {
               await member.roles.add(role);
-              console.log(
+              logs.push(
                 `Assigned ${schoolName} role and renamed ${fullName} (Discord ID: ${discordId})`
               );
             }
           }
         } else {
           console.error(`Member with Discord ID ${discordId} not found`);
+          logs.push(`Member with Discord ID ${discordId} not found`);
         }
       } catch (error: unknown) {
         console.error(
+          `Failed to process ${fullName} (Discord ID: ${discordId}): ${
+            (error as Error).message
+          }`
+        );
+        logs.push(
           `Failed to process ${fullName} (Discord ID: ${discordId}): ${
             (error as Error).message
           }`
@@ -129,6 +128,7 @@ export default async (req: Request, context: Context) => {
     return new Response(
       JSON.stringify({
         message: "Role assignment and renaming completed",
+        logs: logs,
       }),
       {
         status: 200,

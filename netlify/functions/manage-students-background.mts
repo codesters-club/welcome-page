@@ -69,7 +69,9 @@ export default async (req: Request, context: Context) => {
 
         const school = page.properties["intro form school"].select.name;
 
-        return { discordId, fullName, school };
+        const approved = page.properties["intro form APPROVED"]?.checkbox;
+
+        return { discordId, fullName, school, approved };
       })
     );
 
@@ -77,7 +79,12 @@ export default async (req: Request, context: Context) => {
 
     const guild = await discordClient.guilds.fetch(discordGuildId);
 
-    for (const { fullName, discordId, school } of users) {
+    const newUsers = users.filter((user) => !user.approved);
+
+    console.log(`Total users: ${users.length}`);
+    console.log(`New users: ${newUsers.length}`);
+
+    for (const { fullName, discordId, school } of newUsers) {
       try {
         const member = await guild.members.fetch(discordId);
         if (member) {

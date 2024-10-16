@@ -40,10 +40,20 @@ export default async (req: Request, context: Context) => {
     const notionResponse = await notion.databases.query({
       database_id: notionDatabaseId,
       filter: {
-        property: "Discord ID",
-        rich_text: {
-          is_not_empty: true,
-        },
+        and: [
+          {
+            property: "Discord ID",
+            rich_text: {
+              is_not_empty: true,
+            },
+          },
+          {
+            property: "intro form APPROVED",
+            checkbox: {
+              equals: false,
+            },
+          },
+        ],
       },
       sorts: [
         {
